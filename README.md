@@ -16,6 +16,6 @@ Features
 
  How to Run
 1. Download or clone the repository
-2. Open `index.html` in a web browser
+2. Open `matthew.html` in a web browser
 
 This project was created as a final activity for Computer Fundamentals and Programming.
