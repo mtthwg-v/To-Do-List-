@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Corporate To-Do List (CRUD)</title>
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #f2f4f8;
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+    }
+
+    .container {
+      background: #ffffff;
+      width: 360px;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    input {
+      flex: 1;
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    button {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 5px;
+      background-color: #4f7cff;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background-color: #3b66e0;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f7f9fc;
+      padding: 8px;
+      border-radius: 5px;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .done {
+      text-decoration: line-through;
+      color: #888;
+    }
+
+    .actions button {
+      margin-left: 5px;
+      background-color: #6c757d;
+    }
+
+    .actions button.delete {
+      background-color: #dc3545;
+    }
+
+    .actions button:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>To-Do List</h2>
+
+    <!-- CREATE -->
+    <div class="input-group">
+      <input type="text" id="taskInput" placeholder="Enter a task">
+      <button onclick="addTask()">Add</button>
+    </div>
+
+    <!-- READ -->
+    <ul id="taskList"></ul>
+  </div>
+
+  <script>
+    // Initial data (runs only once)
+    if (!localStorage.getItem("tasks")) {
+      localStorage.setItem("tasks", JSON.stringify([
+        { id: 1, text: "washing dishes", done: false },
+        { id: 2, text: "run for 5 km", done: false },
+        { id: 3, text: "cook dinner", done: false }
+      ]));
+    }
+
+    function getTasks() {
+      return JSON.parse(localStorage.getItem("tasks")) || [];
+    }
+
+    function saveTasks(tasks) {
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+
+    // CREATE
+    function addTask() {
+      const input = document.getElementById("taskInput");
+      const text = input.value.trim();
+
+      if (text === "") {
+        alert("Please enter a task");
+        return;
+      }
+
+      const tasks = getTasks();
+      tasks.push({
+        id: Date.now(),
+        text: text,
+        done: false
+      });
+
+      saveTasks(tasks);
+      input.value = "";
+      displayTasks();
+    }
+
+    // READ
+    function displayTasks() {
+      const list = document.getElementById("taskList");
+      list.innerHTML = "";
+
+      getTasks().forEach(task => {
+        const li = document.createElement("li");
+
+        const span = document.createElement("span");
+        span.textContent = task.text;
+        if (task.done) span.classList.add("done");
+
+        const actions = document.createElement("div");
+        actions.className = "actions";
+
+        // UPDATE
+        const doneBtn = document.createElement("button");
+        doneBtn.textContent = "Done";
+        doneBtn.onclick = () => markDone(task.id);
+
+        // DELETE
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "Delete";
+        deleteBtn.className = "delete";
+        deleteBtn.onclick = () => deleteTask(task.id);
+
+        actions.appendChild(doneBtn);
+        actions.appendChild(deleteBtn);
+
+        li.appendChild(span);
+        li.appendChild(actions);
+        list.appendChild(li);
+      });
+    }
+
+    // UPDATE
+    function markDone(id) {
+      const tasks = getTasks();
+      const task = tasks.find(t => t.id === id);
+      if (task) task.done = true;
+      saveTasks(tasks);
+      displayTasks();
+    }
+
+    // DELETE
+    function deleteTask(id) {
+      const tasks = getTasks().filter(t => t.id !== id);
+      saveTasks(tasks);
+      displayTasks();
+    }
+
+    displayTasks();
+  </script>
+
+</body>
+</html>
